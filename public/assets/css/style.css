@@ -1,0 +1,539 @@
+/*
+div{
+	border: 1px solid red;
+}
+*/
+#myCanvas2,
+#myCanvas3,
+#myCanvas,
+#result{
+	background-color : "#fff";
+	border: 1px solid #696969;
+}
+
+#myCanvas2,
+#myCanvas3{
+margin: 0;
+}
+
+#menu *{
+font-size: 20px;
+}
+
+.bkg{
+display:none;
+}
+
+#check_detail{
+	text-decoration: underline;
+	cursor: pointer;
+}
+
+#myCanvas{
+cursor: url(../../assets/img/pen.gif) 2 35, auto
+}
+
+#result{
+padding:3px 0 3px 0;
+font-size:10px;
+line-height: 10px;
+letter-spacing: 3.5px;
+width:200px;
+height:200px;
+}
+
+#header{
+text-align:center;
+height:40px;
+width:100%;
+padding:1px 0 10px 0 ;
+color:#fff;
+font-family: 'メイリオ', sans-serif;
+background: #000;
+font-size: 10px;
+margin-top:-20px;
+margin-bottom:10px;
+}
+
+#menu{
+width:100%;
+}
+
+#login-erea button{
+width:300px;
+height:50px;
+font-size: 20px;
+}
+
+#erase{
+width:200px  !important;
+}
+
+#learn_datas{
+	font-size:5px;
+}
+
+#background{
+//display: none;
+width:100%;
+height:100%;
+background: #000;
+position: absolute;
+top:0;
+left:0;
+opacity:0.6;
+z-index: 9996;
+margin:0;
+padding:0;
+}
+
+
+
+#howto{
+width:830px;
+height:550px;
+border-radius:0px;
+padding:10px;
+position: fixed;
+box-shadow: 10px 10px 2px 1px rgba(255, 255, 255, 0.2) inset, 10px 8px 5px -4px rgba(0, 0, 0, 0.1);
+border:1px solid #dcdcdc;
+z-index: 9997;
+margin:0px 0 0 -415px;
+top:10%;
+left:50%;
+text-align:center;
+}
+
+#manage-box{
+//display:none;
+width:150px;
+border-radius:0px;
+padding:10px;
+height:100%;
+overflow: auto;
+position: fixed;
+background: #4b0082;
+box-shadow: 0 0 2px 1px rgba(255, 255, 255, 0.2) inset, 0 8px 5px -4px rgba(0, 0, 0, 0.1);
+border:1px solid #dcdcdc;
+}
+
+#manage-box span{
+color:#fff;
+}
+
+#manage-box li{
+text-decoration: underline;
+cursor: pointer;
+color:#fff;
+}
+
+#manage-box ul{
+margin-left:-15px;
+color:#fff;
+}
+
+#manage-box h3{
+border-bottom:1px solid #dcdcdc;
+padding-top:10px;
+color:#fff;
+}
+
+#manage-box *{
+	font-size:13px;
+}
+
+#test_answer span{
+font-size: 20px;
+}
+
+.no{
+	font-size: 20px !important;
+}
+
+#test_answer span{
+font-size:300px;
+}
+
+#test_answer{
+width:300px;
+height:300px;
+display:none;
+position: absolute;
+background: #4b0082;
+color:#fff;
+border-radius: 10px;
+border: 3px solid #fff;
+padding:20px;
+box-shadow: 0 0 5px #dcdcdc;
+text-align:center;
+z-index: 9997;
+top:40%;
+left:50%;
+text-align: center;
+margin:-70px 0px 0 -180px;
+}
+
+.a{
+width:10%;
+}
+
+.b{
+width:12px;
+}
+
+#second td{
+	width:25%;
+}
+
+.tab{overflow:hidden;}
+.tab li{
+	background:#ccc;
+	padding:5px 25px;
+	float:left;
+	margin-right:1px;
+	list-style: none;
+	font-size:12px;
+	border-top: 1px solid #dcdcdc;
+	border-left: 1px solid #dcdcdc;
+	cursor: pointer;
+}
+
+.tab li.select{
+	background:#eee;
+	box-shadow: 0 0 5px #dcdcdc;
+}
+
+
+.content{
+text-align: center;
+padding:10px;
+}
+
+.hide {display:none;}
+
+.tab{
+margin-left:-40px;
+margin-bottom:0px;
+}
+
+.main {
+padding-bottom:30px;
+margin-top:20px;
+
+}
+
+.main div{
+margin: 0 auto;
+}
+
+.main,
+.content{
+width:100%;
+}
+
+textarea,input{
+font-size: 12px;
+border: 1px solid #696969;
+}
+
+
+p,span{
+	font-size: 12px;
+}
+
+#text-space table{
+width:100%;
+}
+
+
+
+#container{
+width:90%;
+padding:0;
+}
+
+hr{
+border:1px solid #dcdcdc;
+}
+
+/* image page */
+
+#temp_img{
+text-align: left;
+}
+
+*{
+font-family: 'メイリオ', sans-serif;
+}
+
+h2{
+	font-size:20px;
+}
+
+
+input{
+padding:4px;
+margin:4px;
+}
+
+
+*{
+	font-family: "Arial",'Meiryo';
+}
+
+.ml_str_area {
+    resize: none;
+    overflow: auto;
+    height: 400px;
+}
+
+td{
+	vertical-align: top;
+	padding:10px;
+	font-size: 12px;
+}
+
+#ga_setting span{
+	font-size: 11px;
+}
+
+.popup{
+	display:none;
+	position: absolute;
+	background: #fff;
+	border-radius: 10px;
+	border: 3px solid #fff;
+	padding:20px;
+	color: #2f4f4f;
+	width:480px;
+	box-shadow: 0 0 5px #dcdcdc;
+	text-align:left;
+	font-size: 15px;
+	z-index: 9997;
+}
+
+.popup table{
+width:100%;
+}
+
+.popup td{
+border-bottom:1px solid #dcdcdc;
+padding:2px;
+}
+
+#message_erea{
+	top:0%;
+	left:50%;
+	text-align: center;
+	margin:-30px 0 0 -275px;
+	width:500px;
+	font-weight: bold;
+}
+
+#learn-status{
+	font-size:13px;
+	color:#fff;
+	top:20%;
+	left:50%;
+	text-align: center;
+	margin:-30px 0 0 -275px;
+	width:500px;
+	background: #4b0082;
+}
+
+#message{
+	margin-top:20px;
+}
+
+.close{
+	float:right;
+	margin-top:-10px;
+	text-decoration: underline;
+	cursor: pointer;
+	z-index: 9999;
+}
+
+.close img{
+margin-left:10px;
+margin-right:-20px;
+margin-top:-10px;
+width:30px;
+height:30px;
+cursor: pointer;
+}
+
+#url_check{
+	top:20%;
+	left:50%;
+	margin:-10px 0 0 -250px;
+	width:500px;
+}
+
+
+#preview_erea{
+	top:20%;
+	left:50%;
+	width:500px;
+	margin:-80px 0 0 -250px;
+	z-index: 9997;
+	font-size: 12px;
+}
+
+
+#feedback_erea{
+	top:30%;
+	left:50%;
+	width:500px;
+	margin:-80px 0 0 -250px;
+}
+
+
+#profile_erea{
+	text-align: center;
+	top:40%;
+	left:50%;
+	width:500px;
+	margin:-80px 0 0 -250px;
+}
+
+#log_erea{
+	top:30%;
+	left:50%;
+	width:500px;
+	margin:-80px 0 0 -250px;
+}
+
+.usr_edit_label{
+padding-top:10px;
+display:block;
+width:100px;
+text-align: right;
+float:left;
+}
+
+.usr_edit_val{
+width:350px;
+text-align: center;
+}
+
+button{
+/*	background: -moz-linear-gradient(top,#0099CC 0%,#006699);
+	background: -webkit-gradient(linear, left top, left bottom, from(#0099CC), to(#006699));
+*/
+	background: #4b0082;
+	border: 1px solid #DDD;
+	color:#FFF;
+	width: 100px;
+	padding: 4px 0;
+	font-size: 12px;
+	margin:5px 0 5px 0;
+}
+
+.btn-s{
+	width:50px;
+}
+
+#feedback_body{
+width:99%;
+resize: none;
+overflow: auto;
+}
+
+#preview_space_inside{
+overflow-y:auto;
+height:450px;
+word-break:break-all;
+}
+
+.blue{
+color:blue;
+}
+
+
+button{
+	cursor: pointer;
+
+}
+
+
+body{
+margin:0;
+padding:0;
+overflow-y: scroll;
+width: 100%;
+//background-image: url("/assets/img/background.jpg");
+}
+
+.ok{
+color:blue;
+}
+
+.ng{
+color:red;
+}
+
+.ch{
+color:gray;
+}
+
+.btn-l{
+	padding:5px 10px 5px 10px;
+}
+
+.focus{
+	 box-shadow:0px 0px 1px 1px rgba(255, 0, 0, 0.4) inset;
+}
+
+#login-erea{
+padding-top:0px;
+}
+
+#first td{
+vertical-align: middle;
+}
+
+#second td{
+vertical-align: top !important;
+}
+
+.top-page .content{
+width:1200px;
+}
+
+.login-form span{
+padding-right:10px;
+}
+
+#login-erea .subtitle{
+margin-top:-40px;
+}
+
+.r{
+text-align: right;
+}
+
+.link{
+text-decoration: underline;
+cursor:pointer;
+}
+
+.label{
+	float:left;
+	display:block;
+	width:90px;
+}
+
+.field{
+padding:0 5px 0 5px;
+width:200px;
+margin-right:10px;
+}
+
+.clearfix{
+clear:both;
+}
+
+
+.form-sub-navi{
+	padding-bottom:20px;
+}

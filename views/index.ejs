@@ -1,0 +1,651 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="ja" xml:lang="ja">
+<head>
+<meta charset="UTF-8">
+<title>はじめてのマシーンラーニング</title>
+<meta name="description" content="">
+<meta name="robots" content="index, follow">
+<link rel="icon" href="">
+<link rel="stylesheet" media="all" href="assets/css/style.css">
+<link rel="stylesheet" media="all" href="assets/css/mg.css">
+<script type="text/javascript" src="assets/js/message.js"></script>
+<script type="text/javascript" src="assets/js/index.js"></script>
+<script type="text/javascript" src="assets/js/jquery.js"></script>
+
+<script type="text/javascript"><!--
+
+var _strokeStyle = 'rgba(0,0,0,1)';
+var _stroke_x=[];
+var _stroke_y=[];
+
+var _w = 240;
+var _h = 240;
+var _lineWidth = 10;
+var _relineWidth = 20;
+
+var _resize_wh = 20;
+
+var _start_pos_x = 0;
+var _start_pos_y = 0;
+var _cur_pos_x = 0;
+var _cur_pos_y = 0;
+
+	$(function(){
+
+			//showHowto();
+
+				var _manage_box_flag = 0;   // 1:moving 0:stop
+
+				function moveMemberBox(){
+
+					$("#manage-box").css({
+						top : 0,
+						left : 0,
+					    'marginLeft': "-" + ($("#manage-box").width() +22)+ "px" //move left
+					});
+				}
+
+				$("body").mousemove(function( event ){
+					//画面に表示させる
+					if(event.pageX < 10 && _manage_box_flag == 0){
+
+						 _manage_box_flag = 1;
+						$("#manage-box").animate({
+						    'marginLeft': "0px" //move right
+						 }, 300, function() {
+						 	_manage_box_flag = 0;
+						 });
+
+					//画面から消す
+					}else if(event.pageX > 100 && _manage_box_flag == 0){
+
+						 _manage_box_flag = 1;
+						$("#manage-box").animate({
+						    'marginLeft': "-" + ($("#manage-box").width() +22)+ "px" //move left
+						 }, 300, function() {
+						 	_manage_box_flag = 0;
+						 });
+
+					}
+				});
+
+				$(window).resize(function(){
+					moveMemberBox();
+					//ajustBackground();
+				});
+
+				moveMemberBox();
+
+				$("#check_detail").click(function(){
+					if($("#check_detail").text()!="変換プロセスを表示しない"){
+						$(".bkg").fadeIn(1000);
+						$("#check_detail").text("変換プロセスを表示しない");
+					}else{
+						$(".bkg").fadeOut(1000);
+						$("#check_detail").text("変換プロセスを表示する");
+					}
+				});
+
+		var drawFlag = false;
+		var oldX;
+		var oldY;
+		var lineWidth = _lineWidth;
+		var can = $('#myCanvas');
+		var can2 = $('#myCanvas2');
+		var p1 = $("#p1");
+		var p2 = $("#p2");
+//		var width = 200;
+
+		clearCanvas("myCanvas");
+
+		// control drawFlag.
+		can.mousedown(function(e){
+			drawFlag = true;
+			oldX = e.clientX - can.position().left;
+			oldY = e.clientY - can.position().top;
+		});
+
+		can.mouseup(function(){
+			drawFlag = false;
+		});
+
+		// draw.
+		can.mousemove(function(e){
+			// show mouse position.
+			var x = e.clientX - can.position().left;
+			var y = e.clientY - can.position().top;
+			p1.text(x);
+			p2.text(y);
+
+			// draw
+			if (drawFlag) {
+				var context = can.get(0).getContext('2d');
+				context.strokeStyle = _strokeStyle;
+				context.lineWidth = lineWidth;
+				context.lineJoin = "round";
+				context.lineCap = "round";
+				context.beginPath();
+				context.moveTo(oldX, oldY);
+				context.lineTo(x, y);
+				context.stroke();
+				context.closePath();
+				addData(x,y);
+			}
+			oldX = x;
+			oldY = y;
+		});
+	});
+
+
+function postlearnData(){
+
+	if($("#ans").val()){
+		var data = arrangeForPost();
+		exec_post_Learn_Data(data,$("#ans").val());
+		restEverything();
+
+
+	}else{
+		alert('plase tell the answer');
+	}
+}
+
+function postTestData(){
+
+	var data = arrangeForPost();
+	exec_post_Test_Data(data);
+}
+
+function postMassLearnData(){
+
+	var datas = []
+
+	if(_stroke_x.length < 40 || _stroke_y.length < 40){
+	    showMessage("e","040");
+		restEverything();
+	}else if(!$("#ans").val()){
+	    showMessage("e","034");
+	}else{
+        showMessage("i","001");
+
+		for(var i=0; i < $("#learn_num").val(); i++){
+			datas.push(i);
+		}
+
+        act();
+
+        function act(){
+                // パラメータが無くなっていれば終了
+            if(datas.length==0) {
+            	if($("#with_learn:checked").val()){
+	            	exec_learn();
+				}else{
+				    showMessage("i","031");
+				}
+
+            	return;
+            }
+                // 配列の先頭を使う
+                var param = datas[0];
+
+                //TODO: 何かの処理
+				var data = arrangeForPost();
+				exec_post_Learn_Data(data,$("#ans").val());
+
+                // 処理済みのパラメータ削除
+                datas.shift();
+                $("#learn_cnt").text("進捗： " + (param + 1) + "/" + $("#learn_num").val());
+                // 次の回の実行予約
+                setTimeout(function(){
+                    act();
+                }, 10);
+                // これで１回の処理は終了
+        }
+
+	}
+
+}
+
+
+//main canvasのデータを太めの線に書き直す
+function arrangeForPost(type){
+
+	//simplelize
+	var cvs = document.getElementById("myCanvas3");
+	var reCtx = cvs.getContext("2d");
+
+	base_x = getMinusOrPlus() * Math.floor(Math.random() * 10 )
+	base_y = getMinusOrPlus() * Math.floor(Math.random() * 10 )
+
+	oldX = _start_pos_x + base_x;
+	oldY = _start_pos_y + base_y;
+
+	reCtx.clearRect(0, 0, _w+300, _h+300);
+
+	for(var i=0; i < _stroke_x.length ;i++){
+
+		x = oldX + (-1) * (_stroke_x[i] + getMinusOrPlus() * Math.floor( Math.random() * 10)/6);
+		y = oldY + (-1) * (_stroke_y[i] + getMinusOrPlus() * Math.floor( Math.random() * 10)/6);
+
+		if(Math.pow((oldY - y), 2) > 100 || Math.pow((oldX - x), 2) > 100){
+			oldX = x;
+			oldY = y;
+		}
+
+		reCtx.strokeStyle = _strokeStyle;
+		reCtx.lineWidth = _relineWidth;
+		reCtx.lineJoin = "round";
+		reCtx.lineCap = "round";
+		reCtx.beginPath();
+		reCtx.moveTo(oldX, oldY);
+		reCtx.lineTo(x, y);
+		reCtx.stroke();
+		reCtx.closePath();
+		oldX = x;
+		oldY = y;
+
+	}
+
+    //開始位置のランダム化
+/*
+	var dir_x = getMinusOrPlus();
+	var dir_y = getMinusOrPlus();
+	var sc_x = Math.floor( Math.random() * 10)/100;
+	var sc_y = Math.floor( Math.random() * 10)/100;
+
+	reCtx.save();
+	reCtx.scale(1 + dir_x*sc_x, 1 + dir_x*sc_y);
+	reCtx.scale(1.5, 1.5);
+*/
+
+	var img = new Image();
+	var cvs = document.getElementById("myCanvas3");
+	img.src  = cvs.toDataURL("image/png");
+
+/*
+	reCtx.restore();
+*/
+
+	var data = "";
+	var preview = "";
+
+	//canvas2にリサイズして書き直す
+	var cvs_sub = document.getElementById("myCanvas2");
+	var ctx_sub = cvs_sub.getContext("2d");
+		ctx_sub.clearRect(0, 0, _resize_wh, _resize_wh);
+	    ctx_sub.drawImage(img, 0, 0,_resize_wh,_resize_wh);
+
+	// convert value to 0 or 1
+	for(var y = 1; y < (_resize_wh+1); y++){
+		for(var x = 1; x < (_resize_wh+1); x++){
+			var imgData = ctx_sub.getImageData(x,y,1,1);
+			if(imgData.data[3] > 1){
+				data += "1.000,";
+				preview += "1";
+			}else{
+				data += "0.000,";
+				preview += "0";
+			}
+		}
+		preview += '<br>';
+	}
+
+	//canvas2のデータを0、1にしたものを保存
+	data = data.substring(0,data.length-1);
+    $("#result").html(preview);
+
+    return data;
+
+//http://ichitcltk.hustle.ne.jp/gudon2/index.php?pageType=file&id=Android041_Graphics8_Matrix
+}
+
+function getMinimumPosImage(){
+
+ var pos=[];
+
+ var x_max = Math.max.apply(null,_stroke_x);
+ var x_min = Math.min.apply(null,_stroke_x);
+ var y_max = Math.max.apply(null,_stroke_y);
+ var y_min = Math.min.apply(null,_stroke_y);
+
+ pos = {
+	 		x_width : x_max - x_min,
+	 		y_width : y_max - y_min
+ 		}
+
+ return pos;
+
+}
+
+function closeHowto(){
+	$("#howto").fadeOut(1000);
+	$("#background").fadeOut(1000);
+}
+
+function showHowto(){
+	$("#howto").fadeIn(1000);
+	$("#background").fadeIn(1000);
+}
+
+function exec_post_Learn_Data(data,ans){
+
+	$.ajax({
+    type : "POST",
+     url : "/insert/learn",
+   cache : false,
+    data : {
+   			data : data,
+	      answer : ans
+	   	   } ,
+  success: function(data){
+	       },
+    error:  function(data){
+            }
+    });
+}
+
+
+function exec_post_Test_Data(data){
+
+    showMessage("i","003");
+
+	$.ajax({
+    type : "POST",
+     url : "/insert/test",
+   cache : false,
+    data : {
+   			data : data
+	   	   } ,
+  success: function(data){
+
+	        $("#test_answer").fadeIn('slow');
+		    $("#test_answer").html("");
+	        $("#message_erea").delay(500).fadeOut('slow');
+
+	        if(!data){
+		        $("#test_answer").html("<img src='assets/img/confuse.png'><br><span class='no'>Sorry...<br>よくわかりませんでした。<br>もう一回書きなおして下さい</span>");
+	        }else{
+		        $("#test_answer").html("<span class='yes'>" + data + "</span>");
+		    }
+	        $("#test_answer").delay(2000).fadeOut('slow');
+
+	        /*
+  			data = data.split(" ");
+  			alert(data[data.length-1]);
+*/
+	       },
+    error:  function(data){
+           }
+    });
+}
+
+
+function exec_learn(){
+
+    showMessage("i","005");
+
+	$.ajax({
+    type : "GET",
+     url : "/learn",
+   cache : false,
+  success: function(data){
+		   	showMessage("i","002");
+	        },
+    error:  function(data){
+  			alert(data);
+           }
+    });
+}
+
+function drop(target){
+
+	$.ajax({
+    type : "GET",
+     url : "/drop/" + target,
+   cache : false,
+  success: function(data){
+			    showMessage("w","032");
+	       },
+    error:  function(data){
+  			alert(data);
+           }
+    });
+}
+
+function countLearnData(){
+
+	$.ajax({
+    type : "GET",
+     url : "/count/learn",
+   cache : false,
+  success: function(data){
+
+  			if(data){
+	  			var temp = data.split("\n");
+	  			var result = "";
+	  			for(var i=0; i < temp.length; i++){
+	  				result += temp[i] + "<br>";
+	  			}
+
+	  			$("#learn_data").html(result);
+	  			$("#learn-status").fadeIn(500);
+  			}else{
+			    showMessage("e","033");
+	  			$("#learn_data").text("");
+  			}
+	       },
+    error:  function(data){
+  			alert(data);
+           }
+    });
+}
+
+function restEverything(){
+	clearCanvas('myCanvas');
+	clearCanvas('myCanvas2');
+	clearCanvas('myCanvas3');
+	cleanStrokehistory();
+	$("#ans").val("");
+}
+
+function clearCanvas(target){
+
+	var cvs = document.getElementById(target);
+	var ctx = cvs.getContext("2d");
+		ctx.clearRect(0, 0, _w, _h);
+}
+
+function cleanStrokehistory(){
+	_stroke_x=[];
+	_stroke_y=[];
+	_start_pos_x = 0;
+	_start_pos_y = 0;
+	_cur_pos_x = 0;
+	_cur_pos_y = 0;
+}
+
+function addData(x,y){
+
+	if(_cur_pos_x==0){
+		_cur_pos_x = x;
+		_cur_pos_y = y;
+		_start_pos_x = x;
+		_start_pos_y = y;
+	//	$("#stroke").append("start : " + x + "," + y + '<br>');
+	}else{
+		_stroke_x.push(_cur_pos_x - x);
+		_stroke_y.push(_cur_pos_y - y);
+	//	$("#stroke").append((Number(_cur_pos_x) - Number(Math.floor(x))) + "," + (Number(_cur_pos_y) - Number(Math.floor(y))) + "<br>");
+		_cur_pos_x = x;
+		_cur_pos_y = y;
+	}
+}
+
+
+function printProperties(obj) {
+    var properties = '';
+    for (var prop in obj){
+        properties += prop + "=" + obj[prop] + "\n";
+    }
+    alert(properties);
+}
+
+function getMinusOrPlus(){
+
+	if(Math.floor( Math.random() * 2)==1){
+		var data = -1;
+	}else{
+		var data = 1;
+	}
+
+	return data
+}
+
+</script>
+</head>
+<body>
+
+    <div id="message_erea" class="popup">
+        <div id="message"></div>
+    </div>
+    <div id="test_answer"></div>
+
+    <div class="main top-page">
+	    <div id="message_erea" class="popup">
+	        <div id="message"></div>
+	    </div>
+	    <div id="header">
+            <h1>はじめてのMachine Learning（サポートベクターマシン）</h1>
+	    </div>
+        <div id="container">
+            <div class="content">
+				<div id="login-erea">
+					<table id="first">
+						<tr>
+							<th>ここに書く（ゆっくり書いてね）</th>
+							<th class="bkg"></th>
+							<th class="bkg">単純にする</th>
+							<th class="bkg"></th>
+							<th class="bkg">リサイズする</th>
+							<th class="bkg"></th>
+							<th class="bkg">0/1のデータにする</th>
+						</tr>
+						<tr>
+							<td class="a">
+								<canvas id="myCanvas" height="240px" width="240px"></canvas>
+							</td>
+							<td class="b bkg">→</td>
+							<td class="a bkg">
+								<canvas id="myCanvas3" height="240px" width="240px"></canvas>
+							</td>
+							<td class="b bkg">→</td>
+							<td class="a bkg">
+<!--								<canvas id="myCanvas2" height="240px" width="240px"></canvas> -->
+								<canvas id="myCanvas2" height="20px" width="20px"></canvas>
+							</td>
+							<td class="b bkg">→</td>
+							<td class="a bkg">
+								<div id="result"></div>
+							</td>
+						</tr>
+						<tr>
+							<td class="a">
+					    		<button id="erase" onclick="restEverything()">消す</button><br>
+					    		<span id="check_detail">変換プロセスを見る</span>
+							</td>
+							<td class="b bkg"></td>
+							<td class="a bkg"></td>
+							<td class="b bkg"></td>
+							<td class="a bkg"></td>
+							<td class="b bkg"></td>
+							<td class="a bkg"></td>
+						</tr>
+					</table>
+					<hr>
+				    <table id="menu">
+				    	<tr>
+
+							<td  colspan="4">
+								これは何？<br><input type="text" id="ans" size="2" style="text-align:center">	<br>
+								<button onclick="postMassLearnData()">学習する</button><br>
+					    		<span id="learn_cnt"></span>
+					    		<!-- <a href="#" onclick="showHowto()">help</a> -->
+							</td>
+<!-- ここ
+							<td  colspan="2">
+								<button onclick="postTestData()">答え合わせ</button>
+							</td>
+								<td  colspan="2">
+								<button onclick="postMassLearnData()">学習する</button><br>
+								これは何？<br><input type="text" id="ans" size="2" style="text-align:center">
+					    		<span id="learn_cnt"></span>
+							</td>
+-->
+						</tr>
+					</table>
+
+					<div>
+						<div id="stroke"></div>
+					</div>
+				<!--
+					<div id="pointer">
+						x : <span id="p1"></span>,
+						y : <span id="p2"></span>
+					</div>
+				-->
+<!--
+				<div id="howto" class="popup">
+					<p class="close blue" onclick='closeHowto()'><img src="https://s3-ap-northeast-1.amazonaws.com/jfra-url-shorter/close.png"></p>
+-->
+
+<!--
+					<video controls autoplay width="700" height="500">
+					<source src='assets/img/start.mp4' >
+					</video>
+					解説動画<br>
+					<iframe width="700" height="500" src="https://www.youtube.com/embed/Pxj1yPftYgA" frameborder="0" allowfullscreen></iframe>
+				</div>
+-->	
+
+				</div>
+			</div>
+		</div>
+	</div>
+	<div>
+<!--	<div style="display:none"> -->
+					<div id="learn-status"  class="popup">
+					<p class="close blue" onclick='$("#learn-status").fadeOut(1000)'><img src="https://s3-ap-northeast-1.amazonaws.com/jfra-url-shorter/close.png"></p>
+						<h3>学習状況（学習データ数)</h3>
+						<p id="learn_data"></p>
+					</div>
+
+					<div id="manage-box">
+						<h3>学習投稿時の設定</h3>
+							<span>学習回数:</span> <input type="text" id="learn_num" size="2" value="50" style="text-align:center"><br>		      	<input type="checkbox" id="with_learn" value="1"><span>＋モデル作成</span>
+
+							<h3>モデル作成</h3>
+							<ul>
+								<li onclick="exec_learn()">学習モデル作成</li>
+								<li onclick="countLearnData()">学習対象データカウント</li>
+							</ul>
+							<h3>テスト</h3>
+							<ul>
+								<li onclick="postTestData()">答え合わせ</li>
+							</ul>
+							<!--
+							<h3>初期化</h3>
+							<ul>
+								<li onclick="drop('test')">テスト用データ初期化</li>
+								<li onclick="drop('learn')">学習用DB初期化</li>
+								<li onclick="drop('all')">全てのデータ初期化</li>
+							</ul>
+							-->
+
+
+
+					</div>
+		</div>
+<!--		<div id="background"></div> -->
+
+</body>
+</html>
